@@ -17,9 +17,12 @@
 
     	components: {
     		appHeader: Header
-    	}
+    	},
+		created() {
+    		this.$store.dispatch('initStocks');
+		}
 
-    }
+	}
 </script>
 
 <style>
