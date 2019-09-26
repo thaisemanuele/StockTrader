@@ -1,6 +1,6 @@
 <template>
 	<div class="col-sm-6 col-md-4">
-		<div class="panel panel-success">
+		<div class="panel panel-info">
 			<div class="panel-heading">
 				<h3 class="panel-title">
 					{{ stock.name }}
@@ -13,14 +13,15 @@
 						   class="form-control"
 						   placeholder="Quantity"
 						   v-model.number="quantity"
+						   :class="{danger: insufficientQuantity}"
 					>
 				</div>
 				<div class="pull-right">
 					<button
 							class="btn btn-success"
 							@click="sellStock"
-							:disabled="quantity <= 0 || !Number.isInteger(quantity)"
-					>Sell</button>
+							:disabled="insufficientQuantity ||quantity <= 0 || !Number.isInteger(quantity)"
+					>{{ insufficientQuantity ? 'No Stocks' : 'Sell' }}</button>
 				</div>
 			</div>
 		</div>
@@ -36,18 +37,31 @@
 		data: () => ({
 			quantity: 0
 		}),
+		computed: {
+			insufficientQuantity() {
+				return this.quantity > this.stock.quantity;
+			}
+		},
 		methods: {
-			...mapActions([
-				'sellStock'
-			]),
+			...mapActions({
+				placeSellOrder: 'sellStock'
+			}),
 			sellStock() {
 				const order = {
 					stockId: this.stock.id,
 					stockPrice: this.stock.price,
 					quantity: this.quantity,
 				};
-				this.sellStock();
+				this.placeSellOrder(order);
+				this.quantity = 0;
 			}
 		}
 	}
 </script>
+
+
+<style scoped>
+	.danger {
+		border: 1px solid crimson;
+	}
+</style>
